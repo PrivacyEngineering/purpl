@@ -36,17 +36,17 @@ import (
 // CustomClaims is our custom metadata
 type CustomClaims struct {
 	Policy struct {
-		Allowed     map[string]string `json:"allowed"`
-		Generalized map[string]string `json:"generalized"`
-		Noised      map[string]string `json:"noised"`
-		Reduced     map[string]string `json:"reduced"`
+		Allowed     map[string][]string `json:"allowed"`
+		Generalized map[string][]string `json:"generalized"`
+		Noised      map[string][]string `json:"noised"`
+		Reduced     map[string][]string `json:"reduced"`
 	} `json:"policy"`
 
 	jwt.StandardClaims
 }
 
-func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return interceptor
+func UnaryServerInterceptor(keyPath string) grpc.UnaryServerInterceptor {
+	return interceptor(keyPath)
 }
 
 func interceptor(keyPath string) grpc.UnaryServerInterceptor {
