@@ -114,13 +114,9 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 				var fieldNames []string
 
 				reflectedMsg.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
-					// name, err := getLastPart(string(fd.FullName()))
-					//name := reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(string(fd.FullName()))).TextName()
 					name := fd.TextName()
-					// fmt.Println("Name: ", name)
 
 					fieldNames = append(fieldNames, name)
-					// fmt.Printf("Appending field: %s\tValue: %v\n", &name, v)
 
 					return true
 				})
@@ -135,11 +131,11 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 							// Generalize the field
 							switch reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)).Kind() {
 							case protoreflect.Int32Kind:
-								// reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(generalizeInt(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Int())))
-								fmt.Print("Parameter: ", claims.Policy.Generalized[field][1])
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(generalizeIntParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Int(), claims.Policy.Generalized[field][1])))
 							case protoreflect.StringKind:
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(generalizeStringParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).String(), claims.Policy.Generalized[field][1])))
+							case protoreflect.FloatKind:
+								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(generalizeFloatParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Float(), claims.Policy.Generalized[field][1])))
 							}
 						} else if contains(claims.Policy.Noised, field) {
 							// Noise the field
@@ -148,6 +144,8 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(noiseIntParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Int(), claims.Policy.Noised[field][1])))
 							case protoreflect.StringKind:
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(noiseStringParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).String(), claims.Policy.Noised[field][1])))
+							case protoreflect.FloatKind:
+								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(noiseFloatParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Float(), claims.Policy.Noised[field][1])))
 							}
 						} else if contains(claims.Policy.Reduced, field) {
 							// Reduce the field
@@ -156,6 +154,8 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(reduceIntParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Int(), claims.Policy.Reduced[field][1])))
 							case protoreflect.StringKind:
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(reduceStringParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).String(), claims.Policy.Reduced[field][1])))
+							case protoreflect.FloatKind:
+								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(reduceFloatParam(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Float(), claims.Policy.Reduced[field][1])))
 							}
 						} else {
 							//Suppress the field
@@ -164,6 +164,8 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(suppressInt(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Int())))
 							case protoreflect.StringKind:
 								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(suppressString(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).String())))
+							case protoreflect.FloatKind:
+								reflectedMsg.Set(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field)), protoreflect.ValueOf(suppressFloat(reflectedMsg.Get(reflectedMsg.Descriptor().Fields().ByName(protoreflect.Name(field))).Float())))
 							}
 						}
 					}
@@ -180,6 +182,10 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 // Suppression functions
 func suppressInt(number int64) int32 {
 	// receives an integer (e.g., house number) and returns -1 as "none".
+	return -1
+}
+func suppressFloat(number float64) float64 {
+	// receives a float (e.g., house number) and returns -1 as "none".
 	return -1
 }
 func suppressString(text string) string {
@@ -233,6 +239,50 @@ func noiseIntParam(number int64, param string) int64 {
 	// The result is a float64, so we'll convert it to int64
 	return int64(math.Abs(float64(result)))
 }
+func noiseFloatParam(number float64, param string) float64 {
+	// receives an int and returns noised version of it.
+	// rand.Int63n returns a non-negative pseudo-random 63-bit integer
+	// available noise functions:
+	// - Gaussian
+	// - Laplace
+	// e.g. noiseIntParam(135, "Gaussian")
+
+	// Gaussian noise
+	var n noise.Noise
+	epsilon := 1.0
+	delta := 0.0
+
+	switch param {
+	case "Gaussian":
+		delta = 0.01
+		n = noise.Gaussian()
+	case "Laplace":
+		n = noise.Laplace()
+	default:
+		log.Fatalf("Error: Unknown noise function: %v", param)
+		return -1
+	}
+
+	// Instantiate a new BoundedSum with the chosen noise mechanism.
+	sumParams := &dpagg.BoundedSumFloat64Options{
+		Epsilon:                  epsilon,
+		Delta:                    delta,
+		Noise:                    n,
+		MaxPartitionsContributed: 1,
+		Lower:                    0,
+		Upper:                    100,
+	}
+	sum := dpagg.NewBoundedSumFloat64(sumParams)
+
+	// Add our number to the sum
+	sum.Add(number)
+
+	// Calculate the result with noise
+	result := sum.Result()
+
+	// The result is a float64, so we'll convert it to int64
+	return math.Abs(float64(result))
+}
 func noiseStringParam(string, param string) string {
 	// currently not implemented
 	// suppressing the field instead
@@ -261,6 +311,15 @@ func generalizeIntParam(number int64, param string) int64 {
 		log.Fatalf("Error on converting string to int: %v", err)
 	}
 	return number/intParam*intParam + 1
+}
+func generalizeFloatParam(number float64, param string) float64 {
+	// receives a float (e.g., house number) and returns its range of 10's as the lower end of the interval.
+	// e.g. 135.0 -> 131.0
+	floatParam, err := strconv.ParseFloat(param, 64)
+	if err != nil {
+		log.Fatalf("Error on converting string to float: %v", err)
+	}
+	return number/floatParam*floatParam + 1
 }
 func generalizeStringParam(text string, param string) string {
 	// receives a string (e.g., street name) and returns the first ncharacter(s), with n=param.
@@ -293,6 +352,16 @@ func reduceIntParam(number int64, param string) int64 {
 		log.Fatalf("Error on converting string to int: %v", err)
 	}
 	return number / intParam * intParam
+}
+func reduceFloatParam(number float64, param string) float64 {
+	// receives a float and divides it by the specified by param.
+	// e.g. reduceFloatParam(135.0, 10) -> 13.5
+
+	floatParam, err := strconv.ParseFloat(param, 64)
+	if err != nil {
+		log.Fatalf("Error on converting string to float: %v", err)
+	}
+	return float64(number) / floatParam * floatParam
 }
 func reduceStringParam(text string, param string) string {
 	// receives a string (e.g., street name) and returns the first n character(s), with n=param.
