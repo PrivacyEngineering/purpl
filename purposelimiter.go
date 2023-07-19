@@ -64,7 +64,6 @@ func interceptor(keyPath string) grpc.UnaryServerInterceptor {
 
 		if md, ok := metadata.FromIncomingContext(ctx); ok {
 			if token := md.Get("authorization"); len(token) > 0 {
-				// assuming the public key is in a file called 'key.pem' in the same directory
 				publicKey, err := loadPublicKey(keyPath)
 				if err != nil {
 					return nil, err
