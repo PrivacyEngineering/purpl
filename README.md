@@ -1,3 +1,7 @@
+<p align="center">
+	<img src="purpl.png" width=50" />
+</p>
+
 # purpl: PURPose Limitation 
 To use this Go module run:
 ```shell
