@@ -27,3 +27,6 @@ s := grpc.NewServer(
 		grpc.UnaryInterceptor(purposelimiter.UnaryServerInterceptor(keyPath)), 
 )
 ```
+## JWT generation
+
+For JWT generation use the [purpl-jwt-go-rsa](https://github.com/PrivacyEngineering/purpl-jwt-go-rsa) or [purpl-jwt-go-ecdsa](https://github.com/PrivacyEngineering/purpl-jwt-go-ecdsa) libraries.
