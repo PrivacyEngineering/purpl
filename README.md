@@ -30,3 +30,7 @@ s := grpc.NewServer(
 ## JWT generation
 
 For JWT generation use the [purpl-jwt-go-rsa](https://github.com/PrivacyEngineering/purpl-jwt-go-rsa) or [purpl-jwt-go-ecdsa](https://github.com/PrivacyEngineering/purpl-jwt-go-ecdsa) libraries.
+
+## Examples
+For a simple example to quickly try out the interceptor, see [purpl-examples](https://github.com/PrivacyEngineering/purpl-examples).
+For an example of a more complex use case using Google's Online Boutique microservice demo, see [purpl-pizza-boutique](https://github.com/PrivacyEngineering/purpl-pizza-boutique)
