@@ -10,20 +10,20 @@ suppressing fields as required. The interceptor leverages RSA public keys for JW
 trustworthy communication.
 
 # Citation
-To cite the [preprint version of the paper](https://arxiv.org/pdf/2404.05598.pdf) to appear in the Proceedings of the 24th International Conference on Web Engineering (ICWE 2024), use the following BibTeX entry:
+To cite the [the paper]([https://arxiv.org/pdf/2404.05598.pdf](https://link.springer.com/chapter/10.1007/978-3-031-62362-2_15#citeas)) in the Proceedings of the 24th International Conference on Web Engineering (ICWE 2024), use the following BibTeX entry:
 ```
-@InProceedings{loechel2024hookin,
-      author={Louis Loechel and Siar-Remzi Akbayin and Elias Grünewald and Jannis Kiesel and Inga Strelnikova and Thomas Janke and Frank Pallas},
-      editor={Stefanidis, Kostas and Systa, Kari and Matera, Maristella and Heil, Sebastian and Kondylakis, Haridimos and Quintarelli, Elisa},
-      title={{Hook-in Privacy Techniques for gRPC-based Microservice Communication}}, 
-      year={2024},
-      publisher="Springer Nature Switzerland",
-      address="Cham",
-      note={to appear in the Proceedings of the 24th International Conference on Web Engineering (ICWE 2024)},
-      eprint={2404.05598},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
+@inproceedings{10.1007/978-3-031-62362-2_15,
+	title        = {Hook-in Privacy Techniques for gRPC-Based Microservice Communication},
+	author       = {Loechel, Louis and Akbayin, Siar-Remzi and Gr{\"u}newald, Elias and Kiesel, Jannis and Strelnikova, Inga and Janke, Thomas and Pallas, Frank},
+	year         = 2024,
+	booktitle    = {Web Engineering},
+	publisher    = {Springer Nature Switzerland},
+	address      = {Cham},
+	pages        = {215--229},
+	isbn         = {978-3-031-62362-2},
+	editor       = {Stefanidis, Kostas and Syst{\"a}, Kari and Matera, Maristella and Heil, Sebastian and Kondylakis, Haridimos and Quintarelli, Elisa}
 }
+
 ```
 
 # purpl: PURPose Limitation 
