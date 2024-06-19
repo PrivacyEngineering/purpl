@@ -10,7 +10,7 @@ suppressing fields as required. The interceptor leverages RSA public keys for JW
 trustworthy communication.
 
 # Citation
-To cite the [the paper]([https://arxiv.org/pdf/2404.05598.pdf](https://link.springer.com/chapter/10.1007/978-3-031-62362-2_15#citeas)) in the Proceedings of the 24th International Conference on Web Engineering (ICWE 2024), use the following BibTeX entry:
+To cite the [the paper](https://link.springer.com/chapter/10.1007/978-3-031-62362-2_15) in the Proceedings of the 24th International Conference on Web Engineering (ICWE 2024), use the following BibTeX entry:
 ```
 @inproceedings{10.1007/978-3-031-62362-2_15,
 	title        = {Hook-in Privacy Techniques for gRPC-Based Microservice Communication},
